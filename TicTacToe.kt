@@ -166,8 +166,9 @@ class Game {
     private val playground = Playground()
     private val messages = Messages()
     private var gameEndReached = false
+    private val matrix = playgroundMatrix
 
-    fun start() {
+    fun start(){
         playground.drawPlayground()
         do {
             player.turn()
@@ -180,23 +181,30 @@ class Game {
     private fun checkRowInMatrix(matrix: Array<Int>, first: Int, second: Int, third: Int): Boolean =
         (matrix[first - 1] == matrix[second - 1] && matrix[third - 1] == matrix[first - 1] && matrix[first - 1] != 0)
 
+    private fun won(): Boolean =
+        checkRowInMatrix(matrix, 1, 2, 3) ||
+                checkRowInMatrix(matrix, 4, 5, 6) ||
+                checkRowInMatrix(matrix, 7, 8, 9) ||
+                checkRowInMatrix(matrix, 1, 4, 7) ||
+                checkRowInMatrix(matrix, 2, 5, 8) ||
+                checkRowInMatrix(matrix, 3, 6, 9) ||
+                checkRowInMatrix(matrix, 1, 5, 9) ||
+                checkRowInMatrix(matrix, 3, 5, 7)
+
+    private fun draw(): Boolean = matrix.all { it != 0 } && !won()
+
     private fun end() {
-        val matrix = playgroundMatrix
-        when (
-            matrix.all { it != 0 } ||
-                    checkRowInMatrix(matrix, 1, 2, 3) ||
-                    checkRowInMatrix(matrix, 4, 5, 6) ||
-                    checkRowInMatrix(matrix, 7, 8, 9) ||
-                    checkRowInMatrix(matrix, 1, 4, 7) ||
-                    checkRowInMatrix(matrix, 2, 5, 8) ||
-                    checkRowInMatrix(matrix, 3, 6, 9) ||
-                    checkRowInMatrix(matrix, 1, 5, 9) ||
-                    checkRowInMatrix(matrix, 3, 5, 7)
-            ) {
+        when (won()) {
             true -> {
                 gameEndReached = true
                 println("Game is over. Player ${player.getPlayerName(player.lastTurn)} wins")
                 messages.playerHasWon(player.lastTurn)
+            }
+        }
+        when (draw()) {
+            true -> {
+                gameEndReached = true
+                println("Game is over. No one has won..")
             }
         }
 
